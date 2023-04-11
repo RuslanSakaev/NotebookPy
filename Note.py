@@ -1,8 +1,8 @@
-# Импортируем модуль json для сохранения записной книжки в файл
+# Импортируем модули json для сохранения записной книжки в файл и модуль для времени
 import json
-
+import datetime
 # Создаем класс для записной книжки
-class Notebook:
+class Note:
     def _init_(self):
         # Создаем пустой список для хранения заметок
         self.notes = []
@@ -29,3 +29,6 @@ class Notebook:
         # Загружаем заметки из файла в формате json
         with open(filename, "r") as f:
             self.notes = json.load(f)
+
+
+
