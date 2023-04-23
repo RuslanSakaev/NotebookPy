@@ -1,61 +1,72 @@
 import json
-import datetime
+from note import Note
+from view import View
 
-# Функция для создания новой заметки
-def create_note():
-    id = input("Введите идентификатор заметки: ")
-    title = input("Введите заголовок заметки: ")
-    body = input("Введите текст заметки: ")
-    date = datetime.datetime.now().strftime("%Y-%m-%d")
-    time = datetime.datetime.now().strftime("%H:%M:%S")
-    note = {
-        "id": id,
-        "title": title,
-        "body": body,
-        "date_created": date,
-        "time_created": time,
-        "date_modified": date,
-        "time_modified": time
-    }
-    return note
 
-# Функция для чтения всех заметок из файла
-def read_notes():
-    with open("note.json", "r") as file:
-        notes = json.load(file)
+class ListOfNotes:
+    __notes = []
+    __view = View()
+    __index = 0
+    __index_stack = []
 
-        # Выводим все заметки в консоль
-    if notes:
-        for id, title, body in notes.items():
-            print(f"Заголовок: {id}")            
-            print(f"Заголовок: {title}")
-            print(f"Содержание: {body}")
-    else:
-        print("Заметок пока нет.")
+    def __init__(self):
+        try:
+            with open('notes.json', 'r') as file:
+                self.__notes = json.load(file)
+                self.__index = len(self.__notes)
+            with open('indexes.json', 'r') as file:
+                self.__index_stack = json.load(file)
+        except EOFError:
+            self.__notes = []
+            self.__view = View()
+            self.__index = 0
+            self.__index_stack = []
 
-# Функция для редактирования заметки
-def edit_note():
-    id = input("Введите идентификатор заметки, которую необходимо отредактировать: ")
-    with open("note.json", "r") as file:
-        notes = json.load(file)
-    for note in notes:
-        if note["id"] == id:
-            title = input("Введите новый заголовок заметки: ")
-            body = input("Введите новый текст заметки: ")
-            date = datetime.datetime.now().strftime("%Y-%m-%d")
-            time = datetime.datetime.now().strftime("%H:%M:%S")
-            note["title"] = title
-            note["body"] = body
-            note["date_modified"] = date
-            note["time_modified"] = time
-    with open("note.json", "w") as file:
-        json.dump(notes, file)
+    def add_note(self):
+        note = Note()
+        note.set_name(self.__view.input_note_name())
+        note.set_text(self.__view.input_note_text())
+        note.update_date()
+        if len(self.__index_stack) == 0:
+            note.set_id(self.__index)
+        else:
+            note.set_id(self.__index_stack.pop())
+        self.__notes.append(note)
+        self.__index = len(self.__notes)
+        self.__view.info_note_msg('add')
 
-# Функция для удаления заметки
-def delete_note():
-    id = input("Введите идентификатор заметки, которую необходимо удалить: ")
-    with open("note.json", "r") as file:
-        notes = json.load(file)
-    notes = [note for note in notes if note["id"] != id]
-    with open("note.json", "w") as file:
-        json.dump(notes, file)
+    def delete_note(self, note):
+        self.__index_stack.append(note.get_id())
+        self.__notes.remove(note)
+        if len(self.__notes) == 0:
+            self.__index_stack.clear()
+        self.__view.info_note_msg('del')
+
+    def read_all_notes(self):
+        self.__view.show_read_all_banner(len(self.__notes))
+        for note in self.__notes:
+            self.__view.show_note(note)
+
+    def manage_note_by_id(self):
+        commands = {1: self.__view.show_note,
+                    2: self.__view.edit_note,
+                    3: self.delete_note}
+        flag = False
+        self.__view.show_manage_note_menu()
+        choice = self.__view.input_number(len(commands.keys()), 'menu')
+        value = self.__view.input_number(self.__index, 'id')
+        for note in self.__notes:
+            if note.get_id() == value:
+                commands[choice](note)
+                flag = True
+        if not flag:
+            self.__view.not_found()
+
+    def save_notes_to_file(self):
+        with open('notes.json', 'w') as file:
+            json.dump(self.__notes, file,
+                      protocol=json.HIGHEST_PROTOCOL)
+        with open('indexes.json', 'w') as file:
+            json.dump(self.__index_stack, file,
+                      protocol=json.HIGHEST_PROTOCOL)
+        self.__view.saved_info()
