@@ -1,9 +1,9 @@
 import json
 from createNote import create_note
 
-# РџСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ СЃР»РѕРІР°СЂСЏ РІ JSON-СЃС‚СЂРѕРєСѓ
+# Преобразование словаря в JSON-строку
 note_json = json.dumps(create_note(), indent=7, ensure_ascii=False)
 
-# Р—Р°РїРёСЃСЊ JSON-СЃС‚СЂРѕРєРё РІ С„Р°Р№Р»
+# Запись JSON-строки в файл
 with open("note.json", "w") as file:
     file.write(note_json)

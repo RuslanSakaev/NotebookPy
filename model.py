@@ -2,6 +2,8 @@ import json
 import datetime
 
 # Функция для создания новой заметки
+
+
 def create_note():
     id = input("Введите идентификатор заметки: ")
     title = input("Введите заголовок заметки: ")
@@ -19,23 +21,60 @@ def create_note():
     }
     return note
 
-# Функция для чтения всех заметок из файла
-def read_notes():
-    with open("note.json", "r") as file:
-        notes = json.load(file)
+# Запись JSON-строки в файл
 
-        # Выводим все заметки в консоль
-    if notes:
-        for id, title, body in notes.items():
-            print(f"Заголовок: {id}")            
-            print(f"Заголовок: {title}")
-            print(f"Содержание: {body}")
-    else:
-        print("Заметок пока нет.")
+
+def save_notes(notes):
+    with open("notes.json", "w") as f:
+        json.dump(notes, f, indent=7)
+
+
+def add_note():
+    notes = read_notes()
+    note_id = len(notes) + 1
+    title = input("Введите заголовок заметки: ")
+    body = input("Введите текст заметки: ")
+    created_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    note = {
+        "id": note_id,
+        "title": title,
+        "body": body,
+        "created_at": created_at,
+        "updated_at": created_at,
+    }
+    notes.append(note)
+    save_notes(notes)
+    print("Заметка добавлена.")
+
+
+# Функция для чтения всех заметок из файла
+
+
+def read_notes():
+    try:
+        with open("note.json") as f:
+            return json.load(f)
+    except FileNotFoundError:
+        return []
+
+
+with open("note.json", "r") as file:
+    notes = json.load(file)
+# Выводим все заметки в консоль
+if notes:
+    for id, title, body in notes.items():
+        print(f"Заголовок: {id}")
+        print(f"Заголовок: {title}")
+        print(f"Содержание: {body}")
+else:
+    print("Заметок пока нет.")
 
 # Функция для редактирования заметки
+
+
 def edit_note():
-    id = input("Введите идентификатор заметки, которую необходимо отредактировать: ")
+    id = input(
+        "Введите идентификатор заметки, которую необходимо отредактировать: ")
     with open("note.json", "r") as file:
         notes = json.load(file)
     for note in notes:
@@ -52,6 +91,8 @@ def edit_note():
         json.dump(notes, file)
 
 # Функция для удаления заметки
+
+
 def delete_note():
     id = input("Введите идентификатор заметки, которую необходимо удалить: ")
     with open("note.json", "r") as file:
