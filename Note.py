@@ -5,34 +5,34 @@ from datetime import datetime
 # Add class
 class Note:
     def __init__(self):
-        self.id = None
+        self.id = 0
         self.name = ""
         self.text = ""
-        self.date = None
+        self.date = 0
 
     def set_id(self, value):
-        self.__id = value
+        self.id = value
 
     def set_name(self, name):
-        self.__name = name
+        self.name = name
 
     def set_text(self, text):
-        self.__text = text
+        self.text = text
 
     def update_date(self):
-        self.__date = datetime.now().strftime('%Y, %B %d, %A | %H:%M')
+        self.date = datetime.now().strftime('%Y, %B %d, %A | %H:%M')
 
     def get_id(self):
-        return self.__id
+        return self.id
 
     def get_name(self):
-        return self.__name
+        return self.name
 
     def get_date(self):
-        return self.__date
+        return self.date
 
     def get_text(self):
-        return self.__text
+        return self.text
 
     def to_dict(self):
         return {
