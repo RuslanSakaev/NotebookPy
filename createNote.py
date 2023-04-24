@@ -1,5 +1,5 @@
 import json
-from note import Note
+from Note import Note
 from view import View
 
 

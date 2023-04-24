@@ -4,10 +4,11 @@ from datetime import datetime
 
 # Add class
 class Note:
-    __id = 0
-    __name = ""
-    __date = ""
-    __text = ""
+    def __init__(self):
+        self.id = None
+        self.name = ""
+        self.text = ""
+        self.date = None
 
     def set_id(self, value):
         self.__id = value
@@ -34,4 +35,9 @@ class Note:
         return self.__text
 
     def to_dict(self):
-        return {'name': self.__name, 'text': self.__text, 'id': self.__id, 'date': self.__date}
+        return {
+            "id": self.id,
+            "name": self.name,
+            "text": self.text,
+            "date": str(self.date),
+        }
