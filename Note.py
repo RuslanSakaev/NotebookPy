@@ -1,34 +1,37 @@
-# Импортируем модули json для сохранения записной книжки в файл и модуль для времени
-import json
-import datetime
-# Создаем класс для записной книжки
+# Importing the time module
+from datetime import datetime
+
+
+# Add class
 class Note:
-    def _init_(self):
-        # Создаем пустой список для хранения заметок
-        self.notes = []
+    __id = 0
+    __name = ""
+    __date = ""
+    __text = ""
 
-    def add_note(self, title, content):
-        # Создаем словарь для заметки
-        note = {"title": title, "content": content}
-        # Добавляем заметку в список
-        self.notes.append(note)
+    def set_id(self, value):
+        self.__id = value
 
-    def display_notes(self):
-        # Выводим все заметки в консоль
-        for note in self.notes:
-            print("Title:", note["title"])
-            print("Content:", note["content"])
-            print("")
+    def set_name(self, name):
+        self.__name = name
 
-    def save_notes(self, filename):
-        # Сохраняем все заметки в файл в формате json
-        with open(filename, "w") as f:
-            json.dump(self.notes, f)
+    def set_text(self, text):
+        self.__text = text
 
-    def load_notes(self, filename):
-        # Загружаем заметки из файла в формате json
-        with open(filename, "r") as f:
-            self.notes = json.load(f)
+    def update_date(self):
+        self.__date = datetime.now().strftime('%Y, %B %d, %A | %H:%M')
 
+    def get_id(self):
+        return self.__id
 
+    def get_name(self):
+        return self.__name
 
+    def get_date(self):
+        return self.__date
+
+    def get_text(self):
+        return self.__text
+
+    def to_dict(self):
+        return {'name': self.__name, 'text': self.__text, 'id': self.__id, 'date': self.__date}
