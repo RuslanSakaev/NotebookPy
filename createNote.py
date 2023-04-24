@@ -3,6 +3,13 @@ from note import Note
 from view import View
 
 
+class NoteEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, Note):
+            return obj.__dict__
+        return json.JSONEncoder.default(self, obj)
+
+
 class ListOfNotes:
     __notes = []
     __view = View()
@@ -16,7 +23,7 @@ class ListOfNotes:
                 self.__index = len(self.__notes)
             with open('indexes.json', 'r') as file:
                 self.__index_stack = json.load(file)
-        except EOFError:
+        except (FileNotFoundError, json.decoder.JSONDecodeError):
             self.__notes = []
             self.__view = View()
             self.__index = 0
@@ -37,7 +44,10 @@ class ListOfNotes:
 
     def delete_note(self, note):
         self.__index_stack.append(note.get_id())
-        self.__notes.remove(note)
+        for index, n in enumerate(self.__notes):
+            if n['id'] == note.get_id():
+                self.__notes.pop(index)
+                break
         if len(self.__notes) == 0:
             self.__index_stack.clear()
         self.__view.info_note_msg('del')
@@ -56,7 +66,7 @@ class ListOfNotes:
         choice = self.__view.input_number(len(commands.keys()), 'menu')
         value = self.__view.input_number(self.__index, 'id')
         for note in self.__notes:
-            if note.get_id() == value:
+            if note['id'] == value:
                 commands[choice](note)
                 flag = True
         if not flag:
@@ -64,9 +74,7 @@ class ListOfNotes:
 
     def save_notes_to_file(self):
         with open('notes.json', 'w') as file:
-            json.dump(self.__notes, file,
-                      protocol=json.HIGHEST_PROTOCOL)
+            json.dump(self.__notes, file)
         with open('indexes.json', 'w') as file:
-            json.dump(self.__index_stack, file,
-                      protocol=json.HIGHEST_PROTOCOL)
+            json.dump(self.__index_stack, file)
         self.__view.saved_info()

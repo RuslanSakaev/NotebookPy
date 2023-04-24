@@ -2,6 +2,10 @@ from createNote import ListOfNotes
 from view import View
 
 
+def len(param):
+    pass
+
+
 class Menu:
     __view = View()
     __notes = ListOfNotes()
