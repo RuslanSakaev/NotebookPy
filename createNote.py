@@ -3,13 +3,6 @@ from note import Note
 from view import View
 
 
-class NoteEncoder(json.JSONEncoder):
-    def default(self, obj):
-        if isinstance(obj, Note):
-            return obj.__dict__
-        return json.JSONEncoder.default(self, obj)
-
-
 class ListOfNotes:
     __notes = []
     __view = View()
@@ -19,7 +12,14 @@ class ListOfNotes:
     def __init__(self):
         try:
             with open('notes.json', 'r') as file:
-                self.__notes = json.load(file)
+                notes_dict = json.load(file)
+                for note_dict in notes_dict:
+                    note = Note()
+                    note.set_name(note_dict['name'])
+                    note.set_text(note_dict['text'])
+                    note.set_id(note_dict['id'])
+                    note.update_date()
+                    self.__notes.append(note)
                 self.__index = len(self.__notes)
             with open('indexes.json', 'r') as file:
                 self.__index_stack = json.load(file)
@@ -73,8 +73,9 @@ class ListOfNotes:
             self.__view.not_found()
 
     def save_notes_to_file(self):
+        note_dicts = [note.to_dict() for note in self.__notes]
         with open('notes.json', 'w') as file:
-            json.dump(self.__notes, file)
+            json.dump(note_dicts, file)
         with open('indexes.json', 'w') as file:
             json.dump(self.__index_stack, file)
         self.__view.saved_info()
